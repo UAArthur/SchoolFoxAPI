@@ -1,7 +1,5 @@
 package net.hauntedstudio;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import net.hauntedstudio.response.auth.schoolfox.*;
 import org.json.JSONObject;
 
@@ -15,7 +13,7 @@ public class SchoolFoxAuthentication {
 
     public static UserResponse login(String username, String password) {
         String authJson = new JSONObject(Map.of("username", username, "password", password, "applicationType", "SchoolFox")).toString();
-        JSONObject response = (JSONObject) SchoolFoxRequestManager.postRequest("/api/users/login", authJson);
+        JSONObject response = (JSONObject) SchoolFoxRequestManager.postRequest("api/users/login", authJson);
 
         if (response != null) {
             UserResponse userResponse = new UserResponse();
@@ -37,7 +35,7 @@ public class SchoolFoxAuthentication {
     // To be implemented
     //SSO Login
     public static String createSSOJwtToken(String baseurl, int tenantId) {
-        String header = "{\"scope\":\"roster-core.readonly openid untis-profile\",\"tenantId\":\"" + tenantId + "\",\"response_type\":\"code\",\"redirect_uri\":\"" + baseurl + "api/users/login/untis/proceed\",\"state\":\""+generateBase64UrlString(16)+"\",\"nonce\":\""+generateBase64UrlString(16)+"\",\"client_id\":\"Schoolfox\"}";
+        String header = "{\"scope\":\"roster-core.readonly openid untis-profile\",\"tenantId\":\"" + tenantId + "\",\"response_type\":\"code\",\"redirect_uri\":\"" + baseurl + "api/users/login/untis/proceed\",\"state\":\"" + generateBase64UrlString(16) + "\",\"nonce\":\"" + generateBase64UrlString(16) + "\",\"client_id\":\"Schoolfox\"}";
 
         String encodedHeader = Base64.getUrlEncoder().withoutPadding().encodeToString(header.getBytes());
         String encodedPayload = Base64.getUrlEncoder().withoutPadding().encodeToString("{}".getBytes());

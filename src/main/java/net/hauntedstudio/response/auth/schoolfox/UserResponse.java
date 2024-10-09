@@ -1,6 +1,8 @@
 package net.hauntedstudio.response.auth.schoolfox;
 
 
+import net.hauntedstudio.response.tables.Schools;
+
 public class UserResponse {
 
     private String token;
@@ -11,6 +13,7 @@ public class UserResponse {
     private int autoLogoutMinutes;
     private boolean twoFactorAuthPassed;
     private String goStudentTutoringAskOnDate;
+    private Schools schools;
 
     // Getters and Setters
 
@@ -76,5 +79,13 @@ public class UserResponse {
 
     public void setGoStudentTutoringAskOnDate(String goStudentTutoringAskOnDate) {
         this.goStudentTutoringAskOnDate = goStudentTutoringAskOnDate;
+    }
+
+    public Schools getSchools() {
+        return schools;
+    }
+
+    public void setSchools(Schools schools) {
+        this.schools = schools;
     }
 }

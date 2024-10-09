@@ -1,79 +1,69 @@
 package net.hauntedstudio;
 
+import net.hauntedstudio.manager.ConfigManager;
+import net.hauntedstudio.manager.ConversationManager;
+import net.hauntedstudio.manager.InventoryManager;
+import net.hauntedstudio.manager.SchoolManager;
 import net.hauntedstudio.response.ConfigResponse;
 import net.hauntedstudio.response.auth.schoolfox.*;
 import net.hauntedstudio.response.auth.untis.UntisSchool;
 import net.hauntedstudio.response.auth.untis.UntisSchoolResponse;
+import net.hauntedstudio.response.inventory.InventoryItem;
+import net.hauntedstudio.response.inventory.InventoryResponse;
+import net.hauntedstudio.response.tables.Conversation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SchoolFox {
     private final ConfigResponse config;
     private static SchoolFox instance = null;
+    public UserResponse user;
+    private final ConfigManager configManager;
+    private final InventoryManager inventoryManager;
+    private final ConversationManager conversationManager;
+    private final SchoolManager schoolManager;
 
-    public SchoolFox() {
+    public SchoolFox(String username, String password) {
         instance = this;
-        this.config = this.getSchoolfoxConfig();
+        this.configManager = new ConfigManager();
+        this.inventoryManager = new InventoryManager();
+        this.conversationManager = new ConversationManager();
+        this.schoolManager = new SchoolManager();
+        //Load Config file
+        this.config = configManager.getSchoolfoxConfig();
+
+        //Login
+        this.user = SchoolFoxAuthentication.login(username, password);
     }
 
-
-    public UserResponse login(String username, String password) {
-        return SchoolFoxAuthentication.login(username, password);
-    }
-
-    // Gets the SchoolFox configuration
-    public ConfigResponse getSchoolfoxConfig() {
-        JSONObject response = (JSONObject) SchoolFoxRequestManager.getRequest("https://my.schoolfox.app", "/config.json", null);
-
-        ConfigResponse config = new ConfigResponse();
-        config.setVersion(response.getString("version"));
-        config.setApplicationType(response.getString("applicationType"));
-        config.setApplicationTypeShort(response.getString("applicationTypeShort"));
-        config.setBaseURL(response.getString("baseURL"));
-        config.setHideDontHaveInvitationCode(response.getBoolean("hideDontHaveInvitationCode"));
-        config.setApmURL(response.getString("apmURL"));
-        config.setEnvironment(response.getString("environment"));
-        config.setBipSsoEnabled(response.getBoolean("bipSsoEnabled"));
-        config.setUniventionSsoEnabled(response.getBoolean("univentionSsoEnabled"));
-        config.setUntisSsoEnabled(response.getBoolean("untisSsoEnabled"));
-
-        return config;
-    }
-
-    public static UntisSchoolResponse searchSchools(String query) {
-        // Use the universal request method
-        Object response = SchoolFoxRequestManager.getRequest("https://api.schoolfox.com", "/api/Schools/Untis/Find", "name=" + query);
-
-        List<UntisSchool> schools = new ArrayList<>();
-        if (response instanceof JSONArray) {
-            JSONArray responseArray = (JSONArray) response;
-            for (int i = 0; i < responseArray.length(); i++) {
-                JSONObject schoolJson = responseArray.getJSONObject(i);
-                UntisSchool schoolItem = new UntisSchool();
-                schoolItem.tenantId = schoolJson.getInt("tenantId");
-                schoolItem.untisName = schoolJson.getString("untisName");
-                schoolItem.name = schoolJson.getString("name");
-                schoolItem.address = schoolJson.getString("address");
-                schoolItem.postCode = schoolJson.getString("postCode");
-                schoolItem.city = schoolJson.getString("city");
-                schoolItem.country = schoolJson.getString("country");
-
-                schools.add(schoolItem);
-            }
-        } else {
-            throw new RuntimeException("Unexpected response type.");
-        }
-
-        return new UntisSchoolResponse(schools);
+    //  Idk what this is doing???????
+    // Implemented, but don't know what to do with it.
+    public JSONArray getSeenHints() {
+        return (JSONArray) SchoolFoxRequestManager.getRequest("api/Users/SeenHints", null, true);
     }
 
     public ConfigResponse getConfig() {
         return this.config;
     }
+
+    public UserResponse getUser() {
+        return user;
+    }
+
+    public InventoryManager getInventoryManager() {
+        return inventoryManager;
+    }
+
+    public ConversationManager getConversationManager() {
+        return conversationManager;
+    }
+
+    public SchoolManager getSchoolManager() {
+        return schoolManager;
+    }
+
     public static SchoolFox getInstance() {
         return instance;
     }

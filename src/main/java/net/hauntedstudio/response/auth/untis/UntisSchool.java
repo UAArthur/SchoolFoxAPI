@@ -9,4 +9,31 @@ public class UntisSchool {
     public String city;
     public String country;
 
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    public String getUntisName() {
+        return untisName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
 }

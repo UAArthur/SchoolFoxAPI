@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public class SchoolFoxRequestManager {
     static String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36 OPR/83.0.4254.46";
-    private static final boolean printRequests = false;
+    private static final boolean printRequests = true;
 
     /**
      * Sends a GET request to the specified endpoint with parameters.
@@ -22,7 +22,11 @@ public class SchoolFoxRequestManager {
      * @return The response from the server as an Object (JSONArray or JSONObject).
      */
     public static Object getRequest(String endpoint, String params) {
-        return getRequest(SchoolFox.getInstance().getConfig().getBaseURL(), endpoint, params);
+        return getRequest(SchoolFox.getInstance().getConfig().getBaseURL(), endpoint, params, false);
+    }
+
+    public static Object getRequest(String endpoint, String params, boolean withAuth) {
+        return getRequest(SchoolFox.getInstance().getConfig().getBaseURL(), endpoint, params, withAuth);
     }
 
     /**
@@ -33,7 +37,7 @@ public class SchoolFoxRequestManager {
      * @param params   The query parameters to include in the request.
      * @return The response from the server as an Object (JSONArray or JSONObject).
      */
-    public static Object getRequest(String baseurl, String endpoint, String params) {
+    public static Object getRequest(String baseurl, String endpoint, String params, boolean withAuth) {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
 
@@ -42,8 +46,18 @@ public class SchoolFoxRequestManager {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", userAgent);
+            if (withAuth)
+                connection.setRequestProperty("x-zumo-auth", SchoolFox.getInstance().user.getToken());
+
+            if (printRequests) {
+                System.out.println("[GET] request to " + url);
+            }
+
 
             int responseCode = connection.getResponseCode();
+            if (printRequests) {
+                System.out.println("[GET] response code: " + responseCode);
+            }
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 
@@ -80,7 +94,7 @@ public class SchoolFoxRequestManager {
     /**
      * Sends a POST request to the specified endpoint with parameters.
      *
-     * @param endpoint The API endpoint to send the request to.
+     * @param endpoint  The API endpoint to send the request to.
      * @param jsonInput The JSON input to send in the request body.
      * @return The response from the server as an Object (JSONArray or JSONObject).
      */
@@ -91,8 +105,8 @@ public class SchoolFoxRequestManager {
     /**
      * Sends a POST request to the specified base URL and endpoint with parameters.
      *
-     * @param baseurl  The base URL of the API.
-     * @param endpoint The API endpoint to send the request to.
+     * @param baseurl   The base URL of the API.
+     * @param endpoint  The API endpoint to send the request to.
      * @param jsonInput The JSON input to send in the request body.
      * @return The response from the server as an Object (JSONArray or JSONObject).
      */
@@ -102,6 +116,9 @@ public class SchoolFoxRequestManager {
 
         try {
             URL url = new URL(baseurl + endpoint);
+            if (printRequests) {
+                System.out.println("[POST] request to " + url);
+            }
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("User-Agent", userAgent);
@@ -122,6 +139,10 @@ public class SchoolFoxRequestManager {
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
+                if (printRequests) {
+                    System.out.println("[POST] response code: " + responseCode);
+                    System.out.println("[POST] response: " + response);
+                }
 
                 // Detect if the response is a JSON array or a JSON object
                 String responseString = response.toString().trim();
@@ -132,6 +153,9 @@ public class SchoolFoxRequestManager {
                 } else {
                     throw new RuntimeException("Unexpected response format: " + responseString);
                 }
+            } else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new RuntimeException("Failed to fetch data: Unauthorized");
+
             } else {
                 throw new RuntimeException("Failed to fetch data: HTTP error code : " + responseCode);
             }

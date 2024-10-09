@@ -1,9 +1,14 @@
-package net.hauntedstudio.response.auth.untis;
+package net.hauntedstudio.response.auth.schoolfox;
 
-class AllRelatedActorTypeIds {
+import org.json.JSONObject;
+
+public class AllRelatedActorTypeIds {
     private String parent;
 
-    // Getters and Setters
+    public AllRelatedActorTypeIds(JSONObject json) {
+        this.parent = json.getString("parent");
+    }
+
     public String getParent() {
         return parent;
     }

@@ -1,4 +1,4 @@
-package net.hauntedstudio.response.untis;
+package net.hauntedstudio.response.auth.untis;
 
 public class UntisSchool {
     public int tenantId;

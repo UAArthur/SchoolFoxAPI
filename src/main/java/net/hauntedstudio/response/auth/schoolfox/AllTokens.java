@@ -1,9 +1,14 @@
-package net.hauntedstudio.response.auth.untis;
+package net.hauntedstudio.response.auth.schoolfox;
 
-class AllTokens {
+import org.json.JSONObject;
+
+public class AllTokens {
     private String parent;
 
-    // Getters and Setters
+    public AllTokens(JSONObject json) {
+        this.parent = json.getString("parent");
+    }
+
     public String getParent() {
         return parent;
     }

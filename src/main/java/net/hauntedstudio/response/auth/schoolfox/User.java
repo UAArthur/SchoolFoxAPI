@@ -49,7 +49,8 @@ public class User {
         this.hasQuietTime = json.getBoolean("hasQuietTime");
         this.lastLogin = json.getString("lastLogin");
         this.email = json.getString("email");
-        this.title = json.getString("title");
+        //Why tf was this removed?
+//        this.title = json.getString("title");
         this.firstName = json.getString("firstName");
         this.lastName = json.getString("lastName");
         this.phoneNumber1Country = json.optString("phoneNumber1Country", null);
